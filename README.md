@@ -14,7 +14,7 @@ The last parameter is a boolean for protected labels. Default False.
 ## Single label (Object)
 Alternatively, you can pass a `LabelWrapper` object like this:
 ```
-LabelWrapper label = new LabelWrapper();
+MassLabelWrapper.LabelWrapper label = new MassLabelWrapper.LabelWrapper();
 label.Name = 'Label Name;
 label.MasterLabel = 'Label_API_Name';
 label.Value = 'Text value of the label';
