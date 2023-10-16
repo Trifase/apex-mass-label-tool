@@ -39,7 +39,7 @@ String textblock = 'Label1;category;Label Value 1\n' +
                    'Label3;category;Label Value 3\n' +
                    'Label4;category;Label Value 4\n';
 ```
-2. Pass the textblock to a self-explainatory `makeLabelListfromCSV()` function, that conveniently return a `List` of `LabelWrapper`
+2. Pass the textblock to a self-explainatory `makeLabelListfromCSV()` function, that conveniently returns a `List` of `MassLabelWrapper.LabelWrapper`
 ```
 List<MassLabelTool.LabelWrapper> labels = MassLabelTool.makeLabelListfromCSV(textblock);
 ```
@@ -54,6 +54,6 @@ MassLabelTool.createLabels(labels);
 21:25:51.51 (429309684)|USER_DEBUG|[64]|DEBUG|Creazione della label Label3: OK
 21:25:51.51 (523438404)|USER_DEBUG|[64]|DEBUG|Creazione della label Label4: OK
 ```
-Should something go wrong, the debug should contain enough information to get you going.
+Should (when) something go wrong, the debug should contain enough information to get you going.
 
 Happy labeling I guess!
