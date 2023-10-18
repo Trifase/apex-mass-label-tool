@@ -2,7 +2,7 @@
  * Created by Luca Bellanti on 2023-10-13.
  */
 
-public class MassLabelTool {
+public class LabelUtils {
 
 
     // This is used to mass create a list of LabelWrapper from a textblock in a CSV-fashion like this:
@@ -112,7 +112,7 @@ public class MassLabelTool {
 
 
     // Metodo usato per creare una label al volo.
-    // Usage: MassLabelTool.createSingleLabel('TestLabel', 'TestValue', 'TestCategory', null);
+    // Usage: LabelUtils.createSingleLabel('TestLabel', 'TestValue', 'TestCategory', null);
     // @param labelName: nome della label (spazi ammessi)
     // @param developerName: nome API della label (Spazi non ammessi, vengono sostituiti dagli anderscore, se null è uguale al nome della label)
     // @param labelValue: valore della label
