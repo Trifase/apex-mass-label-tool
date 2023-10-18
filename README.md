@@ -7,7 +7,7 @@ This tiny tool can be used in a couple of ways.
 
 ## Single label (direct)
 ```
-MassLabelTool.createSingleLabel('Label Name', 'Label_API_Name', 'Text value of the label', 'Category', 'en_US', False);
+MassLabelTool.createSingleLabel('Label Name', 'Label_API_Name', 'Text value of the label', 'Category', 'en_US', false);
 ```
 The last parameter is a boolean for protected labels. Default False.
 
