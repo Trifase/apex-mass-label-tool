@@ -7,7 +7,7 @@ This tiny tool can be used in a couple of ways.
 
 ## Single label (direct)
 ```
-MassLabelTool.createSingleLabel('Label Name', 'Label_API_Name', 'Text value of the label', 'Category', 'en_US', false);
+LabelUtils.createSingleLabel('Label Name', 'Label_API_Name', 'Text value of the label', 'Category', 'en_US', false);
 ```
 The last parameter is a boolean for protected labels. Default False.
 
@@ -22,9 +22,9 @@ label.isProtected = 'false';
 label.Language = 'en_US';
 label.Category = 'Category';
 ```
-and pass `label` to `MassLabelTool.createLabel()` that returns 'OK' or 'KO' as a string:
+and pass `label` to `LabelUtils.createLabel()` that returns 'OK' or 'KO' as a string:
 ```
-String result = MassLabelTool.createLabel(label);
+String result = LabelUtils.createLabel(label);
 System.debug(result);
 >DEBUG|OK
 ```
@@ -41,11 +41,11 @@ String textblock = 'Label1;category;Label Value 1\n' +
 ```
 2. Pass the textblock to a self-explainatory `makeLabelListfromCSV()` function, that conveniently returns a `List` of `MassLabelWrapper.LabelWrapper`
 ```
-List<MassLabelTool.LabelWrapper> labels = MassLabelTool.makeLabelListfromCSV(textblock);
+List<LabelUtils.LabelWrapper> labels = LabelUtils.makeLabelListfromCSV(textblock);
 ```
 3. Pass the labels list to `createLabels()`:
 ```  
-MassLabelTool.createLabels(labels);
+LabelUtils.createLabels(labels);
 ```
 4. Enjoy!
 ```
