@@ -94,7 +94,9 @@ public class MassLabelTool {
         // System.debug('Label string: ' + labelStr);
         req.setHeader('Authorization', 'Bearer ' + UserInfo.getSessionId());
         req.setHeader('Content-Type', 'application/json');
-        req.setEndpoint(Url.getSalesforceBaseUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
+        // getSalesforceBaseUrl is deprecated from api 58
+        // req.setEndpoint(Url.getSalesforceBaseUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
+        req.setEndpoint(Url.getOrgDomainUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
         req.setMethod('POST');
         req.setBody(labelStr);
 
@@ -145,7 +147,9 @@ public class MassLabelTool {
         // System.debug('Label string: ' + labelStr);
         req.setHeader('Authorization', 'Bearer ' + UserInfo.getSessionId());
         req.setHeader('Content-Type', 'application/json');
-        req.setEndpoint(Url.getSalesforceBaseUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
+        // getSalesforceBaseUrl is deprecated from api 58
+        // req.setEndpoint(Url.getSalesforceBaseUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
+        req.setEndpoint(Url.getOrgDomainUrl().toExternalForm()+'/services/data/v56.0/tooling/sobjects/ExternalString');
         req.setMethod('POST');
         req.setBody(labelStr);
 
