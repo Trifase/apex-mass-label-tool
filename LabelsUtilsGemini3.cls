@@ -1,4 +1,20 @@
 public class LabelUtils {
+/*
+
+// 1. Define the Labels (Name;Category;Value)
+String textblock = 
+    'ManageSA_Title_Main;ManageSA;Manage SA Trackings\n' +
+    'ManageSA_Title_RelatedTracking;ManageSA;Related Apply SA Tracking\n' +
+    'ManageSA_Btn_CreateDeal;ManageSA;Create SO business Deal\n';
+
+// 2. Parse CSV
+List<LabelUtils.LabelWrapper> labelList = LabelUtils.makeLabelListfromCSV(textblock);
+
+// 3. Create Labels (This performs the Callouts)
+LabelUtils.createLabels(labelList);
+*/
+
+
 
     // Wrapper to hold label data
     public class LabelWrapper {
