@@ -84,8 +84,11 @@
 		helper.startProcessing(component, validRows, 'translate');
 	},
 
+	handleLanguageChange: function (component, event, helper) {
+		helper.clearTranslationsOnRows(component);
+	},
+
 	handleFetchRowData: function (component, event, helper) {
-		console.log('fetch row data event received');
 		let rowIndex = event.getSource().get('v.value');
 		helper.fetchLabelDataFromServer(component, rowIndex);
 	}

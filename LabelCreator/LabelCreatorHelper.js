@@ -128,6 +128,15 @@
 		$A.enqueueAction(action);
 	},
 
+	clearTranslationsOnRows: function (component) {
+		let rows = component.get('v.rows');
+		for (let i = 0; i < rows.length; i++) {
+			rows[i].localizationId = null;
+			rows[i].translationValue = '';
+		}
+		component.set('v.rows', rows);
+	},
+
 	fetchLabelDataFromServer: function (component, rowIndex) {
 		let helper = this;
 		let rows = component.get('v.rows');
@@ -150,6 +159,7 @@
 				if (result.found) {
 					currentRows[rowIndex].englishValue = result.englishValue;
 					currentRows[rowIndex].labelId = result.labelId;
+					currentRows[rowIndex].setupLink = '/lightning/setup/ExternalStrings/page?address=%2F' + result.labelId;
 					if (result.localizationId) {
 						currentRows[rowIndex].localizationId = result.localizationId;
 						currentRows[rowIndex].translationValue = result.translationValue;

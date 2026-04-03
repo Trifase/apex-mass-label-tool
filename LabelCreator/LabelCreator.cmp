@@ -93,7 +93,10 @@
                             </aura:if>
                         </div>
                         <div class="slds-col slds-shrink slds-m-left_medium" style="min-width: 200px;">
-                            <lightning:select label="Translation Language" value="{!v.translationLanguage}" variant="label-inline">
+                            <lightning:select label="Translation Language"
+                                              value="{!v.translationLanguage}"
+                                              variant="label-inline"
+                                              onchange="{!c.handleLanguageChange}">
                                 <option value="">-- None --</option>
                                 <option value="it">Italian (it)</option>
                                 <option value="fr">French (fr)</option>
@@ -149,21 +152,34 @@
                             <td>
                                 <div class="slds-grid slds-grid_vertical-align-center">
                                     <div class="slds-col slds-grow">
-                                <lightning:input value="{!row.apiName}"
-                                                 variant="label-hidden"
-                                                 label="API Name"
-                                                 placeholder="e.g. MyLabel_Name"
-                                                 disabled="{!v.isProcessing}" />
+                                        <lightning:input value="{!row.apiName}"
+                                                         variant="label-hidden"
+                                                         label="API Name"
+                                                         placeholder="e.g. MyLabel_Name"
+                                                         disabled="{!v.isProcessing}" />
                                     </div>
                                     <aura:if isTrue="{!v.mode == 'translate'}">
                                         <div class="slds-col slds-no-flex slds-m-left_xx-small">
-                                            <lightning:buttonIcon iconName="utility:refresh"
-                                                                  variant="border-filled"
-                                                                  size="small"
-                                                                  onclick="{!c.handleFetchRowData}"
-                                                                  value="{!idx}"
-                                                                  title="Fetch existing label data"
-                                                                  disabled="{!or(v.isProcessing, empty(row.apiName))}" />
+                                            <div class="slds-grid slds-grid_vertical-align-center">
+                                                <lightning:buttonIcon iconName="utility:refresh"
+                                                                      variant="border-filled"
+                                                                      size="small"
+                                                                      onclick="{!c.handleFetchRowData}"
+                                                                      value="{!idx}"
+                                                                      title="Fetch existing label data"
+                                                                      disabled="{!or(v.isProcessing, empty(row.apiName))}" />
+
+                                                <aura:if isTrue="{!row.setupLink}">
+                                                    <a href="{!row.setupLink}"
+                                                       target="_blank"
+                                                       class="slds-m-left_xx-small"
+                                                       title="Open Custom Label Setup">
+                                                        <lightning:buttonIcon iconName="utility:new_window"
+                                                                              variant="border-filled"
+                                                                              size="small" />
+                                                    </a>
+                                                </aura:if>
+                                            </div>
                                         </div>
                                     </aura:if>
                                 </div>
