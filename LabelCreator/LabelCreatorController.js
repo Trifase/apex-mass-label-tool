@@ -4,7 +4,7 @@
 
 ({
 	doInit: function (component, event, helper) {
-		helper.addEmptyRows(component, 10);
+		helper.addEmptyRows(component, 5);
 	},
 
 	addRows: function (component, event, helper) {
@@ -16,7 +16,7 @@
 		component.set('v.successCount', 0);
 		component.set('v.processedCount', 0);
 		component.set('v.totalToProcess', 0);
-		helper.addEmptyRows(component, 10);
+		helper.addEmptyRows(component, 5);
 	},
 
 	removeRow: function (component, event, helper) {
