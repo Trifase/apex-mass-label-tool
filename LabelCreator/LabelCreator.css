@@ -1,0 +1,31 @@
+/**
+ * Created by Luca Bellanti on 2026-04-03.
+ */
+
+.THIS .label-creator-table .slds-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.THIS .label-creator-table .slds-table thead th {
+    background: #f3f3f3;
+    font-weight: 600;
+    border-bottom: 2px solid #dddbda;
+}
+
+.THIS .label-creator-table .slds-table td {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.THIS .row-processing {
+    background-color: #fffde7 !important;
+}
+
+.THIS .row-success {
+    background-color: #e8f5e9 !important;
+}
+
+.THIS .row-error {
+    background-color: #fce4ec !important;
+}

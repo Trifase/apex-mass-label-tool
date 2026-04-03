@@ -1,0 +1,249 @@
+<!--
+ - Created by Luca Bellanti on 2026-04-03.
+ -->
+<!--
+    Mass Custom Label Creator
+    URL-addressable Aura component for creating multiple custom labels + Italian translations.
+    Uses LabelUtils via LabelCreatorController.
+-->
+
+<aura:component description="LabelCreator" controller="LabelCreatorController"
+                implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="rows" type="List" default="[]" description="List of label row objects" />
+    <aura:attribute name="isProcessing" type="Boolean" default="false" description="True while labels are being created" />
+    <aura:attribute name="translationLanguage" type="String" default="it" description="Selected translation language code" />
+    <aura:attribute name="mode" type="String" default="create" description="Component mode: 'create' or 'translate'" />
+    <aura:attribute name="currentProcessingIndex" type="Integer" default="-1" />
+    <aura:attribute name="processedCount" type="Integer" default="0" />
+    <aura:attribute name="totalToProcess" type="Integer" default="0" />
+    <aura:attribute name="successCount" type="Integer" default="0" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:html tag="style">
+        .label-creator-table input {
+            min-width: 120px;
+        }
+        .label-creator-table .slds-input {
+            font-size: 0.8125rem;
+        }
+        .label-creator-table td {
+            vertical-align: middle;
+        }
+        .row-processing {
+            background-color: #fffde7 !important;
+        }
+        .row-success {
+            background-color: #e8f5e9 !important;
+        }
+        .row-error {
+            background-color: #fce4ec !important;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .status-badge.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-badge.error {
+            background: #fce4ec;
+            color: #c62828;
+        }
+    </aura:html>
+
+    <div class="slds-p-around_medium">
+        <lightning:card title="{!v.mode == 'create' ? 'Mass Custom Label Creator' : 'Mass Label Translator'}" iconName="{!v.mode == 'create' ? 'custom:custom18' : 'custom:custom89'}">
+
+            <aura:set attribute="actions">
+                <lightning:buttonGroup>
+                    <lightning:button label="Create Labels" iconName="utility:add" onclick="{!c.switchToCreate}"
+                                      variant="{!v.mode == 'create' ? 'brand' : 'neutral'}" disabled="{!v.isProcessing}" />
+                    <lightning:button label="Translate Labels" iconName="utility:world" onclick="{!c.switchToTranslate}"
+                                      variant="{!v.mode == 'translate' ? 'brand' : 'neutral'}" disabled="{!v.isProcessing}" />
+                </lightning:buttonGroup>
+                <lightning:button label="Add 5 Rows" iconName="utility:add" onclick="{!c.addRows}" variant="neutral" disabled="{!v.isProcessing}" />
+                <lightning:button label="Clear All" iconName="utility:delete" onclick="{!c.clearAll}" variant="destructive-text" disabled="{!v.isProcessing}" />
+            </aura:set>
+
+            <!-- Info banner -->
+            <div class="slds-p-horizontal_medium slds-p-bottom_small">
+                <div class="slds-box slds-box_xx-small slds-theme_shade slds-m-bottom_small">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                        <div class="slds-col slds-grow">
+                            <aura:if isTrue="{!v.mode == 'create'}">
+                                <p class="slds-text-body_small slds-text-color_weak">
+                                    <lightning:icon iconName="utility:info" size="xx-small" variant="bare" class="slds-m-right_xx-small" />
+                                    <strong>Create mode:</strong> Enter label data below. <strong>API Name</strong> and <strong>English Value</strong> are required.
+                                    Category and Translation are optional.
+                                </p>
+                                <aura:set attribute="else">
+                                    <p class="slds-text-body_small slds-text-color_weak">
+                                        <lightning:icon iconName="utility:world" size="xx-small" variant="bare" class="slds-m-right_xx-small" />
+                                        <strong>Translate mode:</strong> Enter existing label <strong>API Names</strong> and their <strong>Translation</strong>.
+                                        The label will be looked up and the translation created. Language is required.
+                                    </p>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        <div class="slds-col slds-shrink slds-m-left_medium" style="min-width: 200px;">
+                            <lightning:select label="Translation Language" value="{!v.translationLanguage}" variant="label-inline">
+                                <option value="">-- None --</option>
+                                <option value="it">Italian (it)</option>
+                                <option value="fr">French (fr)</option>
+                                <option value="de">German (de)</option>
+                                <option value="es">Spanish (es)</option>
+                                <option value="pt_BR">Portuguese - Brazil (pt_BR)</option>
+                                <option value="nl_NL">Dutch (nl_NL)</option>
+                                <option value="ja">Japanese (ja)</option>
+                                <option value="zh_CN">Chinese Simplified (zh_CN)</option>
+                                <option value="ko">Korean (ko)</option>
+                                <option value="pl">Polish (pl)</option>
+                                <option value="ru">Russian (ru)</option>
+                                <option value="tr">Turkish (tr)</option>
+                            </lightning:select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress bar (visible during processing) -->
+                <aura:if isTrue="{!v.isProcessing}">
+                    <div class="slds-m-bottom_small">
+                        <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
+                            <span class="slds-text-body_small">{!'Processing ' + v.processedCount + ' of ' + v.totalToProcess + '...'}</span>
+                            <span class="slds-text-body_small slds-text-color_success">{!v.successCount + ' succeeded'}</span>
+                        </div>
+                        <div class="slds-progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{!v.totalToProcess > 0 ? (v.processedCount / v.totalToProcess * 100) : 0}" role="progressbar">
+                            <span class="slds-progress-bar__value slds-progress-bar__value_success" style="{!'width: ' + (v.totalToProcess > 0 ? (v.processedCount / v.totalToProcess * 100) : 0) + '%'}">
+                            </span>
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+
+            <!-- Table -->
+            <div class="slds-scrollable_x slds-p-horizontal_medium label-creator-table">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+                    <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col" style="width: 40px;" class="slds-text-align_center">#</th>
+                        <th scope="col" style="{!'width: ' + (v.mode == 'create' ? '22%' : '25%') + ';'}">API Name *</th>
+                        <th scope="col" style="width: 14%;" class="{!v.mode == 'create' ? '' : 'slds-hide'}">Category</th>
+                        <th scope="col" style="width: 25%;" class="{!v.mode == 'create' ? '' : 'slds-hide'}">English Value *</th>
+                        <th scope="col" style="width: 25%;" class="{!v.mode == 'translate' ? '' : 'slds-hide'}">English Value (Read Only)</th>
+                        <th scope="col" style="{!'width: ' + (v.mode == 'create' ? '25%' : '30%') + ';'}">{!v.mode == 'translate' ? 'Translation *' : 'Translation'}</th>
+                        <th scope="col" style="width: 40px;"></th>
+                        <th scope="col" style="width: 180px;">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <aura:iteration items="{!v.rows}" var="row" indexVar="idx">
+                        <tr class="{!row.status == 'processing' ? 'row-processing' : (row.status == 'success' ? 'row-success' : (row.status == 'error' ? 'row-error' : ''))}">
+                            <td class="slds-text-align_center slds-text-color_weak">{!idx + 1}</td>
+                            <td>
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <div class="slds-col slds-grow">
+                                <lightning:input value="{!row.apiName}"
+                                                 variant="label-hidden"
+                                                 label="API Name"
+                                                 placeholder="e.g. MyLabel_Name"
+                                                 disabled="{!v.isProcessing}" />
+                                    </div>
+                                    <aura:if isTrue="{!v.mode == 'translate'}">
+                                        <div class="slds-col slds-no-flex slds-m-left_xx-small">
+                                            <lightning:buttonIcon iconName="utility:refresh"
+                                                                  variant="border-filled"
+                                                                  size="small"
+                                                                  onclick="{!c.handleFetchRowData}"
+                                                                  value="{!idx}"
+                                                                  title="Fetch existing label data"
+                                                                  disabled="{!or(v.isProcessing, empty(row.apiName))}" />
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </td>
+                            <td class="{!v.mode == 'create' ? '' : 'slds-hide'}">
+                                <lightning:input value="{!row.category}"
+                                                 variant="label-hidden"
+                                                 label="Category"
+                                                 placeholder="optional"
+                                                 disabled="{!v.isProcessing}" />
+                            </td>
+                            <td class="{!v.mode == 'create' ? '' : 'slds-hide'}">
+                                <lightning:input value="{!row.englishValue}"
+                                                 variant="label-hidden"
+                                                 label="English Value"
+                                                 placeholder="English text"
+                                                 disabled="{!v.isProcessing}" />
+                            </td>
+                            <td class="{!v.mode == 'translate' ? '' : 'slds-hide'}">
+                                <lightning:input value="{!row.englishValue}"
+                                                 variant="label-hidden"
+                                                 label="English Value (Read Only)"
+                                                 readonly="true"
+                                                 placeholder="fetches on click"
+                                                 disabled="{!v.isProcessing}" />
+                            </td>
+                            <td>
+                                <lightning:input value="{!row.translationValue}"
+                                                 variant="label-hidden"
+                                                 label="Translation"
+                                                 placeholder="{!empty(v.translationLanguage) ? 'select language' : (v.mode == 'translate' ? 'translated text' : 'optional')}"
+                                                 disabled="{!or(v.isProcessing, empty(v.translationLanguage))}" />
+                            </td>
+                            <td class="slds-text-align_center">
+                                <aura:if isTrue="{!!v.isProcessing}">
+                                    <lightning:buttonIcon iconName="utility:close"
+                                                          variant="bare"
+                                                          alternativeText="Remove row"
+                                                          onclick="{!c.removeRow}"
+                                                          value="{!idx}"
+                                                          size="small" />
+                                </aura:if>
+                            </td>
+                            <td>
+                                <aura:if isTrue="{!row.status == 'processing'}">
+                                    <lightning:spinner size="x-small" variant="brand" alternativeText="Processing" />
+                                </aura:if>
+                                <aura:if isTrue="{!row.status == 'success'}">
+                                    <span class="status-badge success">{!'✅ ' + row.statusMessage}</span>
+                                </aura:if>
+                                <aura:if isTrue="{!row.status == 'error'}">
+                                    <span class="status-badge error" title="{!row.statusMessage}">{!'❌ Failed: ' + row.statusMessage}</span>
+                                </aura:if>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer with action button -->
+            <div class="slds-p-around_medium slds-text-align_right">
+                <aura:if isTrue="{!v.mode == 'create'}">
+                    <lightning:button label="Create Labels"
+                                      iconName="utility:upload"
+                                      onclick="{!c.createLabels}"
+                                      variant="brand"
+                                      disabled="{!v.isProcessing}" />
+                    <aura:set attribute="else">
+                        <lightning:button label="Translate Labels"
+                                          iconName="utility:world"
+                                          onclick="{!c.translateLabels}"
+                                          variant="brand"
+                                          disabled="{!or(v.isProcessing, empty(v.translationLanguage))}" />
+                    </aura:set>
+                </aura:if>
+            </div>
+
+        </lightning:card>
+    </div>
+
+    <lightning:messages />
+</aura:component>
